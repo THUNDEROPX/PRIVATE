@@ -1,0 +1,6 @@
+python-telegram-bot==20.3
+gtts
+pydub
+speechrecognition
+requests
+ffmpeg-python
