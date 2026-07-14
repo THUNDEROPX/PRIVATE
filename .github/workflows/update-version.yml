@@ -1,0 +1,46 @@
+name: Update Version
+
+on:
+  push:
+    paths:
+      - "/*.zip"
+      - "/*.apk"
+      - "**/*.APK" # जब भी zip या apk फ़ाइल पुश हो
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update Version
+        run: |
+          if [ ! -f version.txt ]; then
+            echo "1.0" > version.txt
+          else
+            version=$(cat version.txt)
+
+            major=$(echo $version | cut -d. -f1)
+            minor=$(echo $version | cut -d. -f2)
+
+            if [ "$minor" -lt 9 ]; then
+              minor=$((minor + 1))
+            else
+              major=$((major + 1))
+              minor=0
+            fi
+
+            echo "$major.$minor" > version.txt
+          fi
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add version.txt
+          git commit -m "Update version" || exit 0
+          git push
